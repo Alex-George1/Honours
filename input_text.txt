@@ -1,0 +1,4 @@
+ImageCrypt Secure Transmission.
+This is the first paragraph of sensitive data.
+This is the second paragraph of sensitive data.
+Confidentiality and Integrity are now verified via RSA and AES-GCM.
