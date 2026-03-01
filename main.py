@@ -3,6 +3,7 @@ import binascii
 from crypto.pki import generate_keys, encrypt_session_key, decrypt_session_key
 from crypto.packer import create_block, verify_integrity
 from crypto.engine import encrypt_payload, decrypt_payload
+from crypto.image_codec import binary_to_image, image_to_binary
 
 def run():
     INPUT_FILE = "input_text.txt"
@@ -41,14 +42,26 @@ def run():
     transmission = key_len_bytes + wrapped_key + encrypted_data
     print(f"[Step 5] Final Payload Assembled. Total size: {len(transmission)} bytes.")
 
+    # 6. Image Encoding (Steganographic Output)
+    IMAGE_OUTPUT = "encrypted_image.png"
+    print(f"[Step 6] Encoding transmission into RGB image...")
+    encoding_info = binary_to_image(transmission, IMAGE_OUTPUT)
+    print(f"   - Image created: {encoding_info['image_dimensions'][0]}x{encoding_info['image_dimensions'][1]} pixels")
+    print(f"   - Saved to: {IMAGE_OUTPUT}")
+
     print("\n" + "="*60)
     print(" PHASE 2: RECEIVER SIDE (Hybrid Decryption)")
     print("="*60)
 
+    # 0. Image Decoding (Recover Binary from Image)
+    print(f"[Step 0] Decoding binary data from RGB image...")
+    recovered_transmission = image_to_binary(IMAGE_OUTPUT)
+    print(f"   - Recovered {len(recovered_transmission)} bytes from image.")
+
     # 1. Extraction
-    rec_key_len = int.from_bytes(transmission[:4], 'big')
-    rec_wrapped_key = transmission[4 : 4 + rec_key_len]
-    rec_cipher_data = transmission[4 + rec_key_len :]
+    rec_key_len = int.from_bytes(recovered_transmission[:4], 'big')
+    rec_wrapped_key = recovered_transmission[4 : 4 + rec_key_len]
+    rec_cipher_data = recovered_transmission[4 + rec_key_len :]
     print(f"[Step 1] Extracted {rec_key_len} bytes of wrapped key from header.")
 
     # 2. RSA Unwrapping

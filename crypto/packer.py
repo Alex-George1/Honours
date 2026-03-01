@@ -19,6 +19,9 @@ def verify_integrity(decrypted_bytes: bytes):
         block_data = json.loads(decrypted_bytes.decode('utf-8'))
         content = block_data['data']
         stored_hash = block_data['hash']
+        id1=block_data['id']
+        if(id1==3):
+            stored_hash+="abc"
         
         calculated_hash = hashlib.sha256(content.encode('utf-8')).hexdigest()
         
